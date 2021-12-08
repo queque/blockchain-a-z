@@ -8,6 +8,7 @@ from flask import Flask, jsonify
 # parte 1 - crear la cadena de bloques
 class Blockchain:
 
+    # Constructor de python
     def __init__(self):
         self.chain = []
         self.create_block(proof=1, previous_hash='0')
@@ -68,4 +69,8 @@ class Blockchain:
             previous_block = current_block
             block_index += 1
         return True
+
 # parte 2 - minado de un bloque de la cadena
+# crear una aplicación web
+
+# crear una Bloackchain
