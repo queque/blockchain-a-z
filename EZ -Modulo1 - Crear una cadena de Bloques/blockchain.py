@@ -2,6 +2,8 @@
 import datetime
 import hashlib
 import json
+
+import flask
 from flask import Flask, jsonify
 
 
@@ -70,7 +72,65 @@ class Blockchain:
             block_index += 1
         return True
 
-# parte 2 - minado de un bloque de la cadena
+
+# Parte 2 - minado de un bloque de la cadena
 # crear una aplicación web
+app = Flask(__name__)
+# Si se obtiene un error 500. actualizar Flask, reiniciar Pycharm
+# app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
 # crear una Bloackchain
+blockchain = Blockchain()
+
+
+# http://127.0.0.1:5000/
+# Minar un nuevo Bloque
+@app.route('/mine_block', methods=['GET'])
+def mine_block():
+    previous_block = blockchain.get_previous_block()
+    previous_proof = previous_block['proof']
+    proof = blockchain.proof_of_work(previous_proof)
+    previous_hash = blockchain.hash(previous_block)
+    block = blockchain.create_block(proof, previous_hash)
+    response = {
+        'message': '¡Enhorabuena! has minado un nuevo bloque',
+        'index': block['index'],
+        'timestamp': block['timestamp'],
+        'proof': block['proof'],
+        'previous_hash': block['previous_hash']
+    }
+    return jsonify(response), 200
+
+
+# Bienvenida al server
+@app.route('/', methods=['GET'])
+def hello():
+    response = '<h1>Bienvenido al servidor Flask de Blockchain A-Z</h1>'
+    return response, 200
+
+
+# TAREA 1: Reto Final
+# Comprobamos si la cadena es válida
+@app.route('/is_valid', methods=['GET'])
+def is_valid():
+    is_valid_chain = blockchain.is_chain_valid(blockchain.chain)
+    message = 'Cadena válida' if is_valid_chain else 'Cadena no válida'
+    response = {
+        'is_valid': is_valid_chain,
+        'message': message
+    }
+    return jsonify(response), 200
+
+
+# Obtener la cadena de bloques al completo
+@app.route('/get_chain', methods=['GET'])
+def get_chain():
+    response = {
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain)
+    }
+    return jsonify(response)
+
+
+# Ejecutar la app
+app.run(host='127.0.0.1', port='5000')
